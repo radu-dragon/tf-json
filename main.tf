@@ -10,14 +10,19 @@ terraform {
 data "http" "json_data" {
   url = var.json_url
 
-  request_headers = {
+  # Optional: Handle authentication if needed
+  request_headers = var.github_token != "" ? {
     Accept        = "application/json"
     Content-Type  = "application/json"
-    Authorization = var.github_token != "" ? "token ${var.github_token}" : null
+    Authorization = "token ${var.github_token}"
+  } : {
+    Accept        = "application/json"
+    Content-Type  = "application/json"
   }
 }
 
 locals {
+  # Parse the JSON response body
   json_content = jsondecode(data.http.json_data.response_body)
 }
 
